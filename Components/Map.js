@@ -1,6 +1,6 @@
 import {useEffect,useState,useRef} from 'react';
 import MapView from 'react-native-maps';
-import { Marker,Polyline } from 'react-native-maps';
+import { Marker,Polyline ,PROVIDER_GOOGLE} from 'react-native-maps';
 import { StyleSheet, View,Text,TouchableOpacity } from 'react-native';
 import {watchPositionAsync,requestForegroundPermissionsAsync, getCurrentPositionAsync, Accuracy,enableNetworkProviderAsync} from 'expo-location'
 import haversine from 'haversine';
@@ -15,6 +15,7 @@ export default function App() {
   const [Listener, SetL] = useState()
   const [start,Setstart] = useState(false)
   const lis = useRef([])
+  const firstpos = useRef()
   const dis = useRef(0)
   const lastpos = useRef()
 
@@ -40,32 +41,36 @@ export default function App() {
 
   const handlepress = async()=>{
     if(!start){
+      lis.current= ([])
+      dis.current = (0)
       lastpos.current = {latitude:lat,longitude:long}
+      firstpos.current = {latitude:lat,longitude:long}
+      lis.current = lis.current.concat([firstpos.current])
       SetL(await watchPositionAsync({accuracy:Accuracy.Highest,timeInterval:1000,distanceInterval:1},(position)=>{positionupdate(position)}))
       Setstart(true)
     }
     else{
+      lis.current = lis.current.concat([firstpos.current])
       Listener.remove()
-      lis.current= ([])
-      dis.current = (0)
       Setstart(false)
     }
   }
   const positionupdate =(position)=>{
-    lis.current = lis.current.concat([{latitude:position.coords.latitude,longitude:position.coords.longitude}])
-    const Distance = haversine(lastpos.current,{latitude:position.coords.latitude,longitude:position.coords.longitude},{unit:'meter'})
-    lastpos.current = {latitude:position.coords.latitude,longitude:position.coords.longitude}
-    dis.current = dis.current + Distance
-    Setlat(position.coords.latitude)
-    Setlong(position.coords.longitude)
-    Setaccu(position.coords.accuracy)
+    if( position.coords.accuracy < 100){
+      lis.current = lis.current.concat([{latitude:position.coords.latitude,longitude:position.coords.longitude}])
+      const Distance = haversine(lastpos.current,{latitude:position.coords.latitude,longitude:position.coords.longitude},{unit:'meter'})
+      lastpos.current = {latitude:position.coords.latitude,longitude:position.coords.longitude}
+      dis.current = dis.current + Distance
+      Setlat(position.coords.latitude)
+      Setlong(position.coords.longitude)
+      Setaccu(position.coords.accuracy)}
   }
 
   return (
     <View style={styles.container}>
       {
         ready? <MapView 
-
+        provider={PROVIDER_GOOGLE}
         style={styles.map}
 
         initialRegion={{

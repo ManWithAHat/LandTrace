@@ -24,10 +24,21 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "config":{
+        "googleMaps":{
+          "apiKey":"AIzaSyAi4aheTrWkalqHFAxEDbUogMEyAobUvM0"
+        }
+      },
+      "package": "com.glitch_2278.LandTrace"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ac8a4cea-5ab1-4e32-9e71-99544e49642d"
+      }
     }
   }
 }
